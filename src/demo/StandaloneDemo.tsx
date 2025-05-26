@@ -1,5 +1,4 @@
 import React from 'react';
-import { HashRouter as Router, Routes, Route } from 'react-router-dom';
 import PlatformDemo from './PlatformDemo';
 import { ApiProvider } from './standalone/contexts/ApiContext';
 
@@ -8,7 +7,7 @@ import './standalone/styles.css';
 
 /**
  * StandaloneDemo is the entry point for the demo when running as a standalone application.
- * It sets up all necessary providers and routing.
+ * It sets up all necessary providers.
  */
 const StandaloneDemo: React.FC = () => {
   // Set the standalone flag
@@ -20,13 +19,9 @@ const StandaloneDemo: React.FC = () => {
 
   return (
     <ApiProvider>
-      <Router>
-        <div className="demo-standalone-container">
-          <Routes>
-            <Route path="/*" element={<PlatformDemo />} />
-          </Routes>
-        </div>
-      </Router>
+      <div className="demo-standalone-container">
+        <PlatformDemo />
+      </div>
     </ApiProvider>
   );
 };
