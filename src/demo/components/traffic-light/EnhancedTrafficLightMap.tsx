@@ -15,6 +15,12 @@ interface EnhancedTrafficLightMapProps {
     lng: number;
   };
   onSuburbSelect?: (suburb: string) => void;
+  focusSuburb?: string;
+  showPropertyLocation?: boolean;
+  propertyAddress?: string;
+  zoomLevel?: number;
+  centerLat?: number;
+  centerLng?: number;
 }
 
 const MAPBOX_TOKEN = 'pk.eyJ1IjoiZXF1aWhvbWVwYXJ0bmVycyIsImEiOiJjbTNzaDVnNnEwZTU0MmpyMGM1MWh0OWJvIn0.4-N9TZtnFGMNF9KYl34o5Q';
@@ -184,11 +190,17 @@ function generateDiverseSuburbScore(name: string): {
 const EnhancedTrafficLightMap: React.FC<EnhancedTrafficLightMapProps> = ({
   selectedSuburb = 'Mosman',
   propertyLocation = {
-    address: '42 Mosman Street',
-    lat: -33.8269,
-    lng: 151.2466
+    address: '49A Central Avenue, Mosman NSW 2088',
+    lat: -33.8298,
+    lng: 151.2441
   },
-  onSuburbSelect
+  onSuburbSelect,
+  focusSuburb,
+  showPropertyLocation = false,
+  propertyAddress,
+  zoomLevel = 10.5,
+  centerLat = -33.8688,
+  centerLng = 151.2093
 }) => {
   const [selectedOverlay, setSelectedOverlay] = useState<OverlayType>('equihome');
   const [suburbBoundaries, setSuburbBoundaries] = useState(initialGeoJSON);
@@ -489,9 +501,9 @@ const EnhancedTrafficLightMap: React.FC<EnhancedTrafficLightMapProps> = ({
         )}
         <Map
           initialViewState={{
-            latitude: -33.8688, // Sydney CBD
-            longitude: 151.2093,
-            zoom: 10.5
+            latitude: centerLat,
+            longitude: centerLng,
+            zoom: zoomLevel
           }}
           mapStyle="mapbox://styles/mapbox/light-v11"
           mapboxAccessToken={MAPBOX_TOKEN}
@@ -511,46 +523,44 @@ const EnhancedTrafficLightMap: React.FC<EnhancedTrafficLightMapProps> = ({
             <Layer {...lineLayer as any} />
           </Source>
 
-          {/* Property location marker */}
-          <Source
-            id="property"
-            type="geojson"
-            data={{
-              type: 'Feature',
-              geometry: {
-                type: 'Point',
-                coordinates: [propertyLocation.lng, propertyLocation.lat]
-              },
-              properties: {
-                address: propertyLocation.address
-              }
-            }}
-          >
-            <Layer {...propertyLayer as any} />
-          </Source>
+          {/* Property location marker - only show if enabled */}
+          {showPropertyLocation && (
+            <>
+              <Source
+                id="property"
+                type="geojson"
+                data={{
+                  type: 'Feature',
+                  geometry: {
+                    type: 'Point',
+                    coordinates: [propertyLocation.lng, propertyLocation.lat]
+                  },
+                  properties: {
+                    address: propertyAddress || propertyLocation.address
+                  }
+                }}
+              >
+                <Layer {...propertyLayer as any} />
+              </Source>
 
-          {/* Property popup */}
-          <Popup
-            longitude={propertyLocation.lng}
-            latitude={propertyLocation.lat}
-            anchor="bottom"
-            closeButton={false}
-            closeOnClick={false}
-          >
-            <div className="p-2">
-              <div className="text-xs font-medium">{propertyLocation.address}</div>
-              <div className="text-xs text-neutral-500">Property Location</div>
-            </div>
-          </Popup>
+              {/* Property popup */}
+              <Popup
+                longitude={propertyLocation.lng}
+                latitude={propertyLocation.lat}
+                anchor="bottom"
+                closeButton={false}
+                closeOnClick={false}
+              >
+                <div className="p-2">
+                  <div className="text-xs font-medium">{propertyAddress || propertyLocation.address}</div>
+                  <div className="text-xs text-neutral-500">Property Location</div>
+                </div>
+              </Popup>
+            </>
+          )}
 
 
         </Map>
-
-        {/* Map Legend */}
-        <MapLegend selectedOverlay={selectedOverlay} />
-
-        {/* Selected suburb info */}
-        <SuburbInfo selectedSuburb={selectedSuburb} />
       </div>
     </div>
   );

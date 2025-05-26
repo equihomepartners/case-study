@@ -1,9 +1,9 @@
+/* Import standalone styles */
+@import './demo/standalone/styles.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-/* Import standalone styles */
-@import './demo/standalone/styles.css';
 
 @layer base {
   :root {
